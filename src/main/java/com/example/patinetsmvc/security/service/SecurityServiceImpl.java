@@ -15,24 +15,25 @@ import java.util.UUID;
 @Service
 @Slf4j
 @AllArgsConstructor
+@Transactional
 
 public class SecurityServiceImpl implements SecurityService {
     private AppUserRepository appUserRepository;
     private AppRoleRepository appRoleRepository;
     private PasswordEncoder passwordEncoder;
-    private com.example.patinetsmvc.security.entities.AppUser AppUser;
+    // private com.example.patinetsmvc.security.entities.AppUser AppUser;
 
 
     @Override
     public AppUser saveUser(String username, String password, String rePassword) {
-        if (password.equals(rePassword))throw new RuntimeException("Password NOT match");
+        if (!password.equals(rePassword))throw new RuntimeException("Password NOT match");
         String hashedPWD=passwordEncoder.encode(password);
         AppUser appUser=new AppUser();
         appUser.setUserId(UUID.randomUUID().toString());
-        AppUser.setUsername(username);
-        AppUser.setPassword(hashedPWD);
-        AppUser.setActive(true);
-        AppUser savedAppUser=appUserRepository.save(AppUser);
+        appUser.setUsername(username);
+        appUser.setPassword(hashedPWD);
+        appUser.setActive(true);
+        AppUser savedAppUser=appUserRepository.save(appUser);
 
         return savedAppUser;
     }
@@ -49,7 +50,7 @@ public class SecurityServiceImpl implements SecurityService {
         return savedAppRole;
     }
 
-    @Transactional
+
     @Override
     public void addRoleToUser(String username, String roleName) {
         AppUser appUser=appUserRepository.findByUsername(username);
